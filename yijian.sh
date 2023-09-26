@@ -52,12 +52,12 @@ else
     echo "$response"
 fi
 
-
 # 第四步：xui安装
 bash <(curl -Ls https://raw.githubusercontent.com/FranzKafkaYu/x-ui/master/install.sh)
 
 # 第五步：ACME证书脚本
 read -p "请输入要申请证书的域名: " cert_domain
+read -p "请输入要接收证书相关通知的邮箱地址: " cert_email  # 新增：询问证书邮箱地址
 
 # 检查是否安装 socat，如果未安装，则自动安装
 if ! command -v socat &> /dev/null; then
@@ -73,8 +73,8 @@ if ! command -v socat &> /dev/null; then
   fi
 fi
 
-# 安装 ACME 证书
+# 安装 ACME 证书并传递邮箱地址
 curl https://get.acme.sh | sh
-~/.acme.sh/acme.sh --register-account -m bb@ny2.co
+~/.acme.sh/acme.sh --register-account -m "$cert_email"  # 使用用户输入的邮箱地址
 ~/.acme.sh/acme.sh  --issue -d $cert_domain --standalone --force
 ~/.acme.sh/acme.sh --installcert -d $cert_domain --key-file /root/private.key --fullchain-file /root/cert.crt
